@@ -1,0 +1,81 @@
+MedAI Medical System - Project Structure
+========================================
+
+Backend (app/) - FastAPI Enterprise Architecture
+-----------------------------------------------
+app/
+├── api/                        # API Route Handlers
+│   ├── v1/                     # Version 1 API Endpoints
+│   │   ├── analytics.py        # Dashboard & System metrics
+│   │   ├── auth.py             # JWT Auth, Login, Register
+│   │   ├── images.py           # Medical image analysis routes
+│   │   ├── patients.py         # Patient record management
+│   │   ├── reports.py          # PDF & Medical summary routes
+│   │   ├── transcription.py    # WebSocket transcription handler
+│   │   ├── router.py           # V1 Router aggregation
+│   │   └── __init__.py
+│   └── __init__.py
+├── core/                       # Core Utilities
+│   ├── security.py             # Password hashing, JWT logic
+│   ├── exceptions.py           # Custom error handlers
+│   └── __init__.py
+├── schemas/                    # Pydantic Data Models
+│   ├── user.py                 # Auth & Profile schemas
+│   ├── patient.py              # Patient record schemas
+│   ├── report.py               # Summary & Session schemas
+│   ├── image.py                # Imaging analysis schemas
+│   └── __init__.py
+├── services/                   # Business Logic Layer
+│   ├── ai_service.py           # Google Gemini AI integration
+│   ├── image_service.py        # Vision processing logic
+│   ├── pdf_service.py          # Professional report generation
+│   ├── transcription_service.py# OpenAI Whisper integration
+│   ├── websocket_manager.py    # Real-time session management
+│   └── __init__.py
+├── config.py                   # Global Pydantic Settings
+├── database.py                 # Motor/MongoDB connection
+├── main.py                     # FastAPI Entry Point
+└── __init__.py
+
+Frontend/ - React Premium Suite
+-------------------------------
+Frontend/
+├── public/                     # Static public assets
+├── src/
+│   ├── api/
+│   │   └── api.js              # Centralized Axios & WS Client
+│   ├── components/             # Reusable UI Components
+│   │   ├── AuthProvider.jsx    # Authentication Context
+│   │   ├── Header.jsx          # Dashboard Top Navigation
+│   │   ├── ProtectedRoute.jsx  # Auth Navigation Guard
+│   │   └── Sidebar.jsx         # Dashboard Side Navigation
+│   ├── hooks/
+│   │   └── useLiveTranscription.js # Transcription stream logic
+│   ├── layouts/
+│   │   └── DashboardLayout.jsx # Primary Page Wrapper
+│   ├── pages/                  # Main View Components
+│   │   ├── Dashboard.jsx       # Real-time Metrics View
+│   │   ├── ImageAnalysis.jsx   # AI Diagnostics View
+│   │   ├── LiveTranscription.jsx# Consultation View
+│   │   ├── Login.jsx           # Auth Suite
+│   │   ├── Register.jsx        # Auth Suite
+│   │   ├── ReportViewer.jsx    # Document Management
+│   │   └── Settings.jsx        # Profile/System Prefs
+│   ├── App.jsx                 # Routing Configuration
+│   ├── App.css                 # Global Premium Styling (replaces index.css)
+│   └── main.jsx                # React Entry Point
+├── .env.example                # Environment template
+├── tailwind.config.js          # Design system config
+└── vite.config.js              # Build & Proxy config
+
+Root Files & Infrastructure
+---------------------------
+reports/                        # Generated PDF archive
+temp_uploads/                   # Temporary file processing
+.env                            # Backend configuration
+.env.example                    # Backend environment template
+production_setup.md             # Deployment documentation
+requirements.txt                # Python dependencies
+run.py                          # Application runner
+README.md                       # Project overview
+project_structure.txt           # Current structure log

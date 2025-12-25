@@ -1,0 +1,178 @@
+2025-11-18 17:08:37,550 - MedicalEMR - INFO - Attempting MongoDB connection (attempt 1/5)...
+2025-11-18 17:08:47,737 - concurrent.futures - ERROR - exception calling callback for <Future at 0x224cfbc17b0 state=finished raised ServerSelectionTimeoutError>
+Traceback (most recent call last):
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\thread.py", line 52, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\_csot.py", line 108, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\database.py", line 892, in command
+    with self.__client._conn_for_reads(read_preference, session) as (
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\mongo_client.py", line 1340, in _conn_for_reads
+    server = self._select_server(read_preference, session)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\mongo_client.py", line 1297, in _select_server
+    server = topology.select_server(server_selector)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 312, in select_server
+    server = self._select_server(selector, server_selection_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 296, in _select_server
+    servers = self.select_servers(selector, server_selection_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 247, in select_servers
+    server_descriptions = self._select_servers_loop(selector, server_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 269, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it, Timeout: 10.0s, Topology Description: <TopologyDescription id: 691c61c5cd2aead1e4cd030c, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it')>]>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\_base.py", line 329, in _invoke_callbacks
+    callback(self)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\futures.py", line 398, in _call_set_state
+    dest_loop.call_soon_threadsafe(_set_state, destination, source)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 790, in call_soon_threadsafe
+    self._check_closed()
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 510, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+2025-11-18 17:10:14,544 - MedicalEMR - INFO - Attempting MongoDB connection (attempt 1/5)...
+2025-11-18 17:10:24,713 - concurrent.futures - ERROR - exception calling callback for <Future at 0x2a7b30e17b0 state=finished raised ServerSelectionTimeoutError>
+Traceback (most recent call last):
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\thread.py", line 52, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\_csot.py", line 108, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\database.py", line 892, in command
+    with self.__client._conn_for_reads(read_preference, session) as (
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\mongo_client.py", line 1340, in _conn_for_reads
+    server = self._select_server(read_preference, session)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\mongo_client.py", line 1297, in _select_server
+    server = topology.select_server(server_selector)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 312, in select_server
+    server = self._select_server(selector, server_selection_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 296, in _select_server
+    servers = self.select_servers(selector, server_selection_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 247, in select_servers
+    server_descriptions = self._select_servers_loop(selector, server_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 269, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it, Timeout: 10.0s, Topology Description: <TopologyDescription id: 691c622675f75655e4084041, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it')>]>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\_base.py", line 329, in _invoke_callbacks
+    callback(self)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\futures.py", line 398, in _call_set_state
+    dest_loop.call_soon_threadsafe(_set_state, destination, source)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 790, in call_soon_threadsafe
+    self._check_closed()
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 510, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+2025-11-18 18:19:23,816 - MedicalEMR - INFO - Attempting MongoDB connection (attempt 1/5)...
+2025-11-18 18:19:33,970 - concurrent.futures - ERROR - exception calling callback for <Future at 0x216bd6617b0 state=finished raised ServerSelectionTimeoutError>
+Traceback (most recent call last):
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\thread.py", line 52, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\_csot.py", line 108, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\database.py", line 892, in command
+    with self.__client._conn_for_reads(read_preference, session) as (
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\mongo_client.py", line 1340, in _conn_for_reads
+    server = self._select_server(read_preference, session)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\mongo_client.py", line 1297, in _select_server
+    server = topology.select_server(server_selector)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 312, in select_server
+    server = self._select_server(selector, server_selection_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 296, in _select_server
+    servers = self.select_servers(selector, server_selection_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 247, in select_servers
+    server_descriptions = self._select_servers_loop(selector, server_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 269, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it, Timeout: 10.0s, Topology Description: <TopologyDescription id: 691c725b3fa0a3b323e2a37d, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it')>]>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\_base.py", line 329, in _invoke_callbacks
+    callback(self)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\futures.py", line 398, in _call_set_state
+    dest_loop.call_soon_threadsafe(_set_state, destination, source)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 790, in call_soon_threadsafe
+    self._check_closed()
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 510, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+2025-11-18 19:41:50,063 - MedicalEMR - INFO - Attempting MongoDB connection (attempt 1/5)...
+2025-11-18 19:42:00,374 - concurrent.futures - ERROR - exception calling callback for <Future at 0x2920b4017b0 state=finished raised ServerSelectionTimeoutError>
+Traceback (most recent call last):
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\thread.py", line 52, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\_csot.py", line 108, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\database.py", line 892, in command
+    with self.__client._conn_for_reads(read_preference, session) as (
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\mongo_client.py", line 1340, in _conn_for_reads
+    server = self._select_server(read_preference, session)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\mongo_client.py", line 1297, in _select_server
+    server = topology.select_server(server_selector)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 312, in select_server
+    server = self._select_server(selector, server_selection_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 296, in _select_server
+    servers = self.select_servers(selector, server_selection_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 247, in select_servers
+    server_descriptions = self._select_servers_loop(selector, server_timeout, address)
+  File "C:\Medical Project\myenv\lib\site-packages\pymongo\topology.py", line 269, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it, Timeout: 10.0s, Topology Description: <TopologyDescription id: 691c85aec4afc01ba3dbb225, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it')>]>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\_base.py", line 329, in _invoke_callbacks
+    callback(self)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\futures.py", line 398, in _call_set_state
+    dest_loop.call_soon_threadsafe(_set_state, destination, source)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 790, in call_soon_threadsafe
+    self._check_closed()
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 510, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+2025-11-19 16:18:52,428 - MedicalEMR - INFO - Attempting MongoDB connection (attempt 1/5)...
+2025-11-19 16:18:52,513 - MedicalEMR - INFO - MongoDB connected successfully
+2025-11-19 18:45:39,936 - MedicalEMR - INFO - Attempting MongoDB connection (attempt 1/5)...
+2025-11-19 18:45:39,940 - MedicalEMR - INFO - MongoDB connected successfully
+2025-11-19 18:45:39,941 - MedicalEMR - WARNING -  React build folder not found (frontend/dist). Running backend only.
+2025-11-19 18:45:39,947 - MedicalEMR - WARNING -  Gemini AI not available - check API key and dependencies
+2025-11-19 18:45:39,957 - concurrent.futures - ERROR - exception calling callback for <Future at 0x1a5aeac3e20 state=finished returned dict>
+Traceback (most recent call last):
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\concurrent\futures\_base.py", line 329, in _invoke_callbacks
+    callback(self)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\futures.py", line 398, in _call_set_state
+    dest_loop.call_soon_threadsafe(_set_state, destination, source)
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 790, in call_soon_threadsafe
+    self._check_closed()
+  File "C:\Users\Hamza Durrani\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 510, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+2025-11-19 18:46:11,385 - MedicalEMR - INFO - Attempting MongoDB connection (attempt 1/5)...
+2025-11-19 18:46:11,391 - MedicalEMR - INFO - MongoDB connected successfully
+2025-11-19 18:46:11,393 - MedicalEMR - WARNING -  React build folder not found (frontend/dist). Running backend only.
+2025-11-19 18:46:11,402 - MedicalEMR - WARNING -  Gemini AI not available - check API key and dependencies
+2025-11-19 18:54:08,522 - MedicalEMR - INFO - Attempting MongoDB connection (attempt 1/5)...
+2025-11-19 18:54:08,526 - MedicalEMR - INFO - MongoDB connected successfully
+2025-11-19 18:54:08,528 - MedicalEMR - WARNING -  React build folder not found (frontend/dist). Running backend only.
+2025-11-19 18:54:08,538 - MedicalEMR - WARNING -  Gemini AI not available - check API key and dependencies
+2025-11-19 18:54:08,596 - MedicalEMR - INFO - Loading Whisper model (base)...
+2025-11-19 18:54:09,908 - MedicalEMR - INFO -  Whisper model (base) loaded successfully!
+2025-11-19 19:47:41,874 - MedicalEMR - INFO - Shutting down FastAPI app...
+2025-11-19 19:47:47,724 - MedicalEMR - INFO - Attempting MongoDB connection (attempt 1/5)...
+2025-11-19 19:47:47,728 - MedicalEMR - INFO - MongoDB connected successfully
+2025-11-19 19:47:47,729 - MedicalEMR - WARNING -  React build folder not found (frontend/dist). Running backend only.
+2025-11-19 19:47:47,736 - MedicalEMR - WARNING -  Gemini AI not available - check API key and dependencies
+2025-11-19 19:47:47,770 - MedicalEMR - INFO - Loading Whisper model (base)...
+2025-11-19 19:47:48,890 - MedicalEMR - INFO -  Whisper model (base) loaded successfully!
+2025-11-19 19:57:14,933 - MedicalEMR - INFO - New user registered: Ramish123 (role: specialist)
+2025-11-19 19:57:48,608 - MedicalEMR - WARNING - Failed login attempt for user: undefined
+2025-11-19 19:57:48,609 - MedicalEMR - WARNING - HTTPException: 401 - Incorrect username or password
+2025-11-19 19:57:48,615 - MedicalEMR - WARNING - HTTPException: 401 - Refresh token missing
