@@ -43,7 +43,7 @@ const LiveTranscription = () => {
   useEffect(() => {
     connectWebSocket(sessionId)
     return () => disconnect()
-  }, [sessionId, connectWebSocket, disconnect])
+  }, [sessionId, connectWebSocket])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -115,8 +115,8 @@ const LiveTranscription = () => {
       {/* Messages */}
       {(error || message.text) && (
         <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in border ${message.type === 'success' ? 'bg-green-50 border-green-100 text-green-700' :
-            message.type === 'warning' ? 'bg-yellow-50 border-yellow-100 text-yellow-700' :
-              'bg-red-50 border-red-100 text-red-700'
+          message.type === 'warning' ? 'bg-yellow-50 border-yellow-100 text-yellow-700' :
+            'bg-red-50 border-red-100 text-red-700'
           }`}>
           <Info className="w-5 h-5 flex-shrink-0" />
           <p className="font-bold text-sm tracking-wide">{error || message.text}</p>

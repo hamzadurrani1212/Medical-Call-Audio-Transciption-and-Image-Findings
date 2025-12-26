@@ -28,12 +28,11 @@ const Login = () => {
     setLoading(true)
     setError('')
 
-    const formPayload = new FormData()
-    formPayload.append('username', formData.username)
-    formPayload.append('password', formData.password)
-
     try {
-      const result = await login(formPayload)
+      const result = await login({
+        username: formData.username,
+        password: formData.password
+      })
       if (result.success) {
         navigate('/dashboard')
       } else {

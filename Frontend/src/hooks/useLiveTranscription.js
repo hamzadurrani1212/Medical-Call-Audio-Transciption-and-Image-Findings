@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { createWebSocket } from '../api/api'
 
 export const useLiveTranscription = () => {
@@ -17,7 +17,11 @@ export const useLiveTranscription = () => {
         sessionId,
         (data) => {
           if (data.type === 'transcript') {
-            setTranscript(prev => prev + ' ' + data.text)
+            if (data.is_historical) {
+              setTranscript(data.text)
+            } else {
+              setTranscript(prev => prev + ' ' + data.text)
+            }
           } else if (data.type === 'error') {
             setError(data.message)
           }
@@ -42,22 +46,40 @@ export const useLiveTranscription = () => {
     }
   }, [])
 
-  const startRecording = async () => {
+  const isRecordingRef = useRef(isRecording)
+  useEffect(() => {
+    isRecordingRef.current = isRecording
+  }, [isRecording])
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorder.current && isRecordingRef.current) {
+      mediaRecorder.current.stop()
+      setIsRecording(false)
+    }
+  }, [])
+
+  const startRecording = useCallback(async () => {
+    if (isRecordingRef.current) return
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+
+      let mimeType = 'audio/webm'
+      if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/ogg'
+      if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4'
+      if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = ''
+
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : {})
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunks.current.push(event.data)
-
-          // Convert blob to base64 and send via WebSocket
           const reader = new FileReader()
           reader.onload = () => {
             if (websocket.current) {
               websocket.current.send({
                 type: 'audio_chunk',
-                data: reader.result.split(',')[1] // Remove data URL prefix
+                data: reader.result.split(',')[1]
               })
             }
           }
@@ -69,44 +91,38 @@ export const useLiveTranscription = () => {
         if (websocket.current) {
           websocket.current.send({ type: 'audio_end' })
         }
-
-        // Stop all tracks
         stream.getTracks().forEach(track => track.stop())
         audioChunks.current = []
       }
 
       mediaRecorder.current = recorder
-      recorder.start(1000) // Send data every second
+      recorder.start(1000)
       setIsRecording(true)
 
     } catch (err) {
       setError('Microphone access denied or not available')
       console.error('Recording error:', err)
     }
-  }
+  }, [])
 
-  const stopRecording = () => {
-    if (mediaRecorder.current && isRecording) {
-      mediaRecorder.current.stop()
-      setIsRecording(false)
-    }
-  }
-
-  const disconnect = () => {
+  const disconnect = useCallback(() => {
     if (websocket.current) {
       websocket.current.close()
     }
-    if (isRecording) {
+    if (isRecordingRef.current) {
       stopRecording()
     }
     setIsConnected(false)
     setTranscript('')
     setError(null)
-  }
+  }, [stopRecording])
 
-  const clearTranscript = () => {
+  const clearTranscript = useCallback(() => {
+    if (websocket.current) {
+      websocket.current.send({ type: 'clear_transcript' })
+    }
     setTranscript('')
-  }
+  }, [])
 
   return {
     isRecording,

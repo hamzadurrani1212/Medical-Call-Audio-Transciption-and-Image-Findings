@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 // Use environment variables for production flexibility
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
-const WS_BASE = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/transcribe'
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1'
+const WS_BASE = import.meta.env.VITE_WS_URL || 'ws://127.0.0.1:8000/ws/transcribe'
 
 // Create axios instance with default config
 const api = axios.create({

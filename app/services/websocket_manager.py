@@ -42,7 +42,7 @@ class ConnectionManager:
         
         self.active_connections.pop(session_id, None)
         self.connection_times.pop(session_id, None)
-        self.session_data.pop(session_id, None)
+        # Note: We keep session_data to allow for reconnection or summary generation
         
         logger.info(f"WebSocket disconnected: {session_id} (duration: {duration})")
     

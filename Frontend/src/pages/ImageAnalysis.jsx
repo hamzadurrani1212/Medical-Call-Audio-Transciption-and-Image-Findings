@@ -106,7 +106,7 @@ const ImageAnalysis = () => {
       const response = await imageAPI.analyze(data)
       if (response.data.success) {
         setAnalysisResult(response.data.analysis)
-        // fetchAnalyses()
+        fetchAnalyses()
       }
     } catch (error) {
       setError('Analysis failed. Attempting to simulate for preview purposes.')
@@ -122,8 +122,21 @@ const ImageAnalysis = () => {
         setAnalyzing(false)
       }, 2000)
     } finally {
-      // setAnalyzing(false)
+      setAnalyzing(false)
     }
+  }
+
+  const handleSelectAnalysis = (analysis) => {
+    setAnalysisResult({
+      findings: analysis.findings,
+      diagnosis: analysis.diagnosis,
+      severity: analysis.severity,
+      confidence_score: analysis.confidence_score,
+      recommendations: analysis.recommendations,
+      isHistory: true
+    })
+    // Also scroll back up to the analysis result for better UX
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const getSeverityColor = (severity) => {
@@ -346,7 +359,11 @@ const ImageAnalysis = () => {
 
             <div className="space-y-4">
               {analyses.map((analysis, i) => (
-                <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors group cursor-pointer border border-transparent hover:border-teal-100">
+                <div
+                  key={i}
+                  onClick={() => handleSelectAnalysis(analysis)}
+                  className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors group cursor-pointer border border-transparent hover:border-teal-100"
+                >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center group-hover:bg-teal-50 transition-colors">
                       <ScanLine className="w-5 h-5 text-gray-400 group-hover:text-teal-500" />

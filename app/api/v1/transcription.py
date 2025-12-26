@@ -6,6 +6,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from app.config import settings
 from app.services import manager, transcribe_audio
 
 router = APIRouter(tags=["Transcription"])
@@ -15,6 +16,17 @@ router = APIRouter(tags=["Transcription"])
 async def websocket_transcribe(websocket: WebSocket, session_id: str):
     """WebSocket endpoint for real-time transcription"""
     await manager.connect(websocket, session_id)
+    
+    # Send existing transcript if any
+    session = manager.get_session(session_id)
+    if session and session.transcript:
+        await manager.send_message({
+            "type": "transcript",
+            "text": session.transcript,
+            "session_id": session_id,
+            "is_historical": True
+        }, session_id)
+        
     audio_buffer = bytearray()
     
     try:
@@ -25,8 +37,21 @@ async def websocket_transcribe(websocket: WebSocket, session_id: str):
             if message_type == "audio_chunk":
                 # Receive audio chunk
                 audio_b64 = data.get("data")
+                if not audio_b64:
+                    continue
+                    
                 try:
                     chunk = base64.b64decode(audio_b64)
+                    
+                    # Safety check: Prevent buffer from growing indefinitely
+                    if len(audio_buffer) + len(chunk) > settings.max_audio_size:
+                        await manager.send_message({
+                            "type": "error",
+                            "message": "Audio buffer limit exceeded"
+                        }, session_id)
+                        audio_buffer.clear()
+                        continue
+                        
                     audio_buffer.extend(chunk)
                 except Exception as e:
                     await manager.send_message({
@@ -80,7 +105,7 @@ async def websocket_transcribe(websocket: WebSocket, session_id: str):
             elif message_type == "clear_transcript":
                 # Clear transcript
                 session = manager.get_session(session_id)
-                if session:
+                if session is not None:
                     session.transcript = ""
                     await manager.send_message({
                         "type": "transcript_cleared"

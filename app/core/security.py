@@ -97,7 +97,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
         raise credentials_exception
     
     users_collection = get_users_collection()
-    if not users_collection:
+    if users_collection is None:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Database connection unavailable"
@@ -124,7 +124,7 @@ async def get_current_active_user(current_user: dict = Depends(get_current_user)
 async def save_refresh_token(token: str, username: str, expires_at: datetime):
     """Save refresh token to database"""
     tokens_collection = get_refresh_tokens_collection()
-    if tokens_collection:
+    if tokens_collection is not None:
         await tokens_collection.insert_one({
             "token": token,
             "username": username,
@@ -137,14 +137,14 @@ async def save_refresh_token(token: str, username: str, expires_at: datetime):
 async def revoke_refresh_token(token: str):
     """Revoke a refresh token"""
     tokens_collection = get_refresh_tokens_collection()
-    if tokens_collection:
+    if tokens_collection is not None:
         await tokens_collection.delete_one({"token": token})
 
 
 async def get_refresh_token_record(token: str) -> Optional[dict]:
     """Get refresh token record from database"""
     tokens_collection = get_refresh_tokens_collection()
-    if tokens_collection:
+    if tokens_collection is not None:
         return await tokens_collection.find_one({"token": token})
     return None
 
@@ -152,7 +152,7 @@ async def get_refresh_token_record(token: str) -> Optional[dict]:
 async def cleanup_expired_tokens():
     """Clean up expired refresh tokens"""
     tokens_collection = get_refresh_tokens_collection()
-    if tokens_collection:
+    if tokens_collection is not None:
         result = await tokens_collection.delete_many({
             "expires_at": {"$lt": datetime.utcnow()}
         })

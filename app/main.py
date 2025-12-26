@@ -9,7 +9,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware import Middleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -35,7 +34,7 @@ logger = logging.getLogger("MedAI")
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
     # Startup
-    logger.info("🚀 Starting MedAI Medical System...")
+    logger.info("Starting MedAI Medical System...")
     
     # Connect to database
     await Database.connect()
@@ -54,20 +53,20 @@ async def lifespan(app: FastAPI):
     os.makedirs(settings.TEMP_DIR, exist_ok=True)
     os.makedirs(settings.LOGS_DIR, exist_ok=True)
     
-    logger.info("✅ MedAI startup complete")
+    logger.info("MedAI startup complete")
     
     yield
     
     # Shutdown
-    logger.info("🛑 Shutting down MedAI...")
+    logger.info("Shutting down MedAI...")
     await Database.disconnect()
-    logger.info("✅ Shutdown complete")
+    logger.info("Shutdown complete")
 
 
 async def create_default_user():
     """Create default admin user if not exists"""
     users = get_users_collection()
-    if not users:
+    if users is None:
         return
     
     default_user = await users.find_one({"username": "doctor"})
@@ -80,7 +79,7 @@ async def create_default_user():
             "created_at": datetime.utcnow(),
             "is_active": True
         })
-        logger.info("👤 Default user created: doctor/doctor123")
+        logger.info("Default user created: doctor/doctor123")
 
 
 # Create FastAPI app
@@ -88,16 +87,16 @@ app = FastAPI(
     title=settings.APP_NAME,
     description="AI-powered medical transcription and analysis platform",
     version=settings.APP_VERSION,
-    lifespan=lifespan,
-    middleware=[
-        Middleware(
-            CORSMiddleware,
-            allow_origins=settings.CORS_ORIGINS,
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
-    ]
+    lifespan=lifespan
+)
+
+# CORS middleware configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include API routes
@@ -110,7 +109,7 @@ app.include_router(ws_router)
 async def root():
     """Root endpoint with system information"""
     return {
-        "status": "MedAI Medical System Running 🏥",
+        "status": "MedAI Medical System Running",
         "version": settings.APP_VERSION,
         "timestamp": datetime.utcnow().isoformat(),
         "features": [
@@ -173,4 +172,4 @@ async def global_exception_handler(request: Request, exc: Exception):
 frontend_dir = os.path.join(os.path.dirname(__file__), "..", "Frontend", "dist")
 if os.path.exists(frontend_dir):
     app.mount("/app", StaticFiles(directory=frontend_dir, html=True), name="frontend")
-    logger.info("📱 Frontend mounted at /app")
+    logger.info("Frontend mounted at /app")

@@ -97,7 +97,7 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
     response_data = {
         "access_token": access_token,
         "token_type": "bearer",
-        "expires_in": settings.JWT_EXPIRY_MINUTES * 60,
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         "user_info": {
             "username": user["username"],
             "full_name": user.get("full_name", ""),
@@ -163,7 +163,7 @@ async def refresh_token_endpoint(
     return {
         "access_token": new_access_token,
         "token_type": "bearer",
-        "expires_in": settings.JWT_EXPIRY_MINUTES * 60
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     }
 
 

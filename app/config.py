@@ -42,6 +42,14 @@ class Settings(BaseSettings):
     MAX_IMAGE_SIZE_MB: int = 10
     MAX_AUDIO_SIZE_MB: int = 25
     
+    @property
+    def max_image_size(self) -> int:
+        return self.MAX_IMAGE_SIZE_MB * 1024 * 1024
+        
+    @property
+    def max_audio_size(self) -> int:
+        return self.MAX_AUDIO_SIZE_MB * 1024 * 1024
+    
     # CORS
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",

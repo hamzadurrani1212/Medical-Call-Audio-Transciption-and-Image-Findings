@@ -37,7 +37,7 @@ class Database:
                 await cls.client.admin.command('ping')
                 cls.db = cls.client[settings.DATABASE_NAME]
                 
-                logger.info("✅ MongoDB connected successfully")
+                logger.info("MongoDB connected successfully")
                 return True
                 
             except Exception as e:
@@ -47,7 +47,7 @@ class Database:
                     await asyncio.sleep(retry_delay)
                     retry_delay *= 1.5
                 else:
-                    logger.error("❌ All MongoDB connection attempts failed")
+                    logger.error("All MongoDB connection attempts failed. Please ensure MongoDB service is running.")
                     return False
         
         return False
@@ -76,43 +76,43 @@ class Database:
 def get_users_collection():
     """Get users collection"""
     db = Database.get_db()
-    return db.users if db else None
+    return db.users if db is not None else None
 
 
 def get_reports_collection():
     """Get medical reports collection"""
     db = Database.get_db()
-    return db.medical_reports if db else None
+    return db.medical_reports if db is not None else None
 
 
 def get_image_analyses_collection():
     """Get image analyses collection"""
     db = Database.get_db()
-    return db.image_analyses if db else None
+    return db.image_analyses if db is not None else None
 
 
 def get_sessions_collection():
     """Get conversation sessions collection"""
     db = Database.get_db()
-    return db.conversation_sessions if db else None
+    return db.conversation_sessions if db is not None else None
 
 
 def get_refresh_tokens_collection():
     """Get refresh tokens collection"""
     db = Database.get_db()
-    return db.refresh_tokens if db else None
+    return db.refresh_tokens if db is not None else None
 
 
 def get_patients_collection():
     """Get patient records collection"""
     db = Database.get_db()
-    return db.patient_records if db else None
+    return db.patient_records if db is not None else None
 
 
 async def create_indexes():
     """Create database indexes for performance"""
     db = Database.get_db()
-    if not db:
+    if db is None:
         return
     
     try:
@@ -138,7 +138,7 @@ async def create_indexes():
         # Patient records
         await db.patient_records.create_index("patient_id", unique=True)
         
-        logger.info("✅ Database indexes created")
+        logger.info("Database indexes created")
         
     except Exception as e:
         logger.error(f"Error creating indexes: {e}")

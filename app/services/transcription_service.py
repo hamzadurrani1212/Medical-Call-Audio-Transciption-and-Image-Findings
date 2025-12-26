@@ -26,10 +26,10 @@ def load_whisper_model():
         import whisper
         logger.info(f"Loading Whisper model ({settings.WHISPER_MODEL_SIZE})...")
         _whisper_model = whisper.load_model(settings.WHISPER_MODEL_SIZE)
-        logger.info("✅ Whisper model loaded successfully")
+        logger.info("Whisper model loaded successfully")
         return _whisper_model
     except Exception as e:
-        logger.error(f"❌ Failed to load Whisper model: {e}")
+        logger.error(f"Failed to load Whisper model: {e}")
         return None
 
 

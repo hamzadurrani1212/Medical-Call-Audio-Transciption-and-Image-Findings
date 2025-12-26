@@ -18,6 +18,37 @@ gemini_vision_model = None
 try:
     import google.generativeai as genai
     
+    class FallbackGenerativeModel:
+        """Wrapper for Gemini models with automatic fallback"""
+        def __init__(self, model_preferred_names, generation_config=None, safety_settings=None):
+            self.model_names = model_preferred_names
+            self.generation_config = generation_config
+            self.safety_settings = safety_settings
+            self._models = {}
+            
+        def _get_model(self, name):
+            if name not in self._models:
+                self._models[name] = genai.GenerativeModel(
+                    name,
+                    generation_config=self.generation_config,
+                    safety_settings=self.safety_settings
+                )
+            return self._models[name]
+            
+        def generate_content(self, contents, **kwargs):
+            last_exception = None
+            for name in self.model_names:
+                try:
+                    model = self._get_model(name)
+                    # For simple prompt strings, this works. For vision lists [prompt, image], it also works.
+                    return model.generate_content(contents, **kwargs)
+                except Exception as e:
+                    logger.warning(f"Gemini model {name} failed: {e}. Trying next available model...")
+                    last_exception = e
+            
+            logger.error(f"All Gemini models ({self.model_names}) failed.")
+            raise last_exception
+
     if settings.GEMINI_API_KEY:
         genai.configure(api_key=settings.GEMINI_API_KEY)
         
@@ -35,24 +66,47 @@ try:
             "max_output_tokens": 2048,
         }
         
-        gemini_model = genai.GenerativeModel(
-            "gemini-pro",
+        # Priority list for models
+        # Using verified names from genai.list_models()
+        # 1. Flash 2.0 (state of the art, very fast)
+        # 2. Flash Latest alias
+        # 3. 1.5 Flash (legacy stable name)
+        # 4. Pro Latest alias
+        text_model_priority = [
+            "gemini-2.0-flash", 
+            "gemini-flash-latest", 
+            "gemini-1.5-flash", 
+            "gemini-pro-latest", 
+            "gemini-pro"
+        ]
+        
+        vision_model_priority = [
+            "gemini-2.0-flash", 
+            "gemini-flash-latest", 
+            "gemini-1.5-flash", 
+            "gemini-pro-latest"
+        ]
+        
+        gemini_model = FallbackGenerativeModel(
+            text_model_priority,
             generation_config=generation_config,
             safety_settings=safety_settings
         )
-        gemini_vision_model = genai.GenerativeModel(
-            "gemini-pro-vision",
+        
+        gemini_vision_model = FallbackGenerativeModel(
+            vision_model_priority,
             generation_config=generation_config,
             safety_settings=safety_settings
         )
-        logger.info("✅ Gemini AI configured successfully")
+        
+        logger.info("Gemini AI configured with fallback support")
     else:
-        logger.warning("⚠️ Gemini API key not configured")
+        logger.warning("Gemini API key not configured")
         
 except ImportError:
-    logger.warning("⚠️ google-generativeai package not installed")
+    logger.warning("google-generativeai package not installed")
 except Exception as e:
-    logger.error(f"❌ Gemini AI configuration failed: {e}")
+    logger.error(f"Gemini AI configuration failed: {e}")
 
 
 def is_ai_available() -> bool:
