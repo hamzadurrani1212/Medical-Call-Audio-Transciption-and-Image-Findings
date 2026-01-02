@@ -52,7 +52,7 @@ const Login = () => {
   ]
 
   return (
-    <div className="auth-layout min-h-screen bg-white">
+    <div className="auth-layout h-screen w-full overflow-hidden bg-white">
       {/* Left Panel - Branding */}
       <div className="auth-left mesh-gradient relative overflow-hidden">
         <div className="relative z-10 max-w-md w-full animate-in">

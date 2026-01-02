@@ -27,11 +27,47 @@ async def get_analytics(current_user: dict = Depends(get_current_user)):
     # Get counts
     total_reports = await reports.count_documents({"doctor_id": current_user["username"]})
     total_images = await images.count_documents({})
+
+    # Get recent activity (reports & images)
+    recent_reports = await reports.find(
+        {"doctor_id": current_user["username"]}
+    ).sort("created_at", -1).limit(5).to_list(5)
+
+    recent_images = await images.find(
+        {"doctor_id": current_user["username"]} # Assuming images also store doctor_id
+    ).sort("created_at", -1).limit(5).to_list(5)
+
+    activity_list = []
+    
+    for r in recent_reports:
+        activity_list.append({
+            "id": str(r["_id"]),
+            "type": "report",
+            "title": f"Report: {r.get('patient_id', 'Unknown')}",
+            "status": "Completed", # Reports are generally done when saved
+            "date": r.get("created_at").isoformat() if r.get("created_at") else None,
+            "details": "Transcription & Report"
+        })
+
+    for img in recent_images:
+        activity_list.append({
+            "id": str(img["_id"]),
+            "type": "image",
+            "title": f"Analysis: {img.get('patient_id', 'Unknown')}",
+            "status": "Completed",
+            "date": img.get("created_at").isoformat() if img.get("created_at") else None,
+            "details": f"Findings: {len(img.get('findings', []))} identified"
+        })
+
+    # Sort combined list by date desc
+    activity_list.sort(key=lambda x: x["date"] or "", reverse=True)
+    recent_activity = activity_list[:5]
     
     return {
         "total_reports": total_reports,
         "total_images": total_images,
-        "username": current_user["username"]
+        "username": current_user["username"],
+        "recent_activity": recent_activity
     }
 
 

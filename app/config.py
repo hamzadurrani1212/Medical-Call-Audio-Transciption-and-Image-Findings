@@ -61,6 +61,7 @@ class Settings(BaseSettings):
     
     # Directories
     REPORTS_DIR: str = "./reports"
+    UPLOAD_DIR: str = "./uploads"
     TEMP_DIR: str = "./temp_uploads"
     LOGS_DIR: str = "./logs"
     

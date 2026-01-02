@@ -19,7 +19,8 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     total_reports: 0,
     total_images: 0,
-    username: user?.full_name || user?.username || 'Doctor'
+    username: user?.full_name || user?.username || 'Doctor',
+    recent_activity: []
   })
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
@@ -32,6 +33,7 @@ const Dashboard = () => {
           ...prev,
           total_reports: response.data.total_reports || 0,
           total_images: response.data.total_images || 0,
+          recent_activity: response.data.recent_activity || []
         }))
       } catch (err) {
         console.error('Failed to fetch stats:', err)
@@ -162,45 +164,52 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Activity & Tips */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 card-luxury p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Recent Activity</h2>
-            <button className="text-teal-600 font-bold hover:underline underline-offset-4 decoration-2">View History</button>
-          </div>
-          <div className="space-y-6">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 hover:bg-gray-50 transition-colors cursor-pointer group">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center shadow-sm">
-                    <Activity className="w-5 h-5 text-teal-500" />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Recent Activity</h2>
+          <button className="text-teal-600 font-bold hover:underline underline-offset-4 decoration-2">View History</button>
+        </div>
+        <div className="space-y-6">
+          {stats.recent_activity && stats.recent_activity.length > 0 ? (
+            stats.recent_activity.map((item) => (
+              <div key={item.id} className="card-luxury p-6 flex items-center justify-between group cursor-pointer hover:border-teal-200 transition-all duration-300">
+                <div className="flex items-center gap-6">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${item.type === 'report' ? 'bg-blue-50 group-hover:bg-blue-500' : 'bg-teal-50 group-hover:bg-teal-500'}`}>
+                    {item.type === 'report' ? (
+                      <Mic className={`w-7 h-7 transition-colors duration-300 ${item.type === 'report' ? 'text-blue-600 group-hover:text-white' : 'text-teal-600 group-hover:text-white'}`} />
+                    ) : (
+                      <ScanLine className={`w-7 h-7 transition-colors duration-300 ${item.type === 'report' ? 'text-blue-600 group-hover:text-white' : 'text-teal-600 group-hover:text-white'}`} />
+                    )}
                   </div>
                   <div>
-                    <h5 className="font-bold text-gray-900">Patient Consultation - Case #{4092 + item}</h5>
-                    <p className="text-sm text-gray-500 font-medium leading-none mt-1">Transcription & Report successful</p>
+                    <h5 className="font-bold text-gray-900 text-lg mb-1">{item.title}</h5>
+                    <p className="text-sm text-gray-500 font-medium">{item.details}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-bold text-gray-400">2h ago</span>
-                  <div className="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase rounded-full">Completed</div>
+
+                <div className="flex items-center gap-8">
+                  <div className="flex flex-col items-end">
+                    <div className="px-3 py-1 bg-green-50 text-green-600 text-xs font-black uppercase rounded-full mb-1">
+                      {item.status}
+                    </div>
+                    {item.date && (
+                      <span className="text-sm font-bold text-gray-400">
+                        {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
+                  </div>
+                  <div className={`w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:text-white transition-all duration-300 ${item.type === 'report' ? 'group-hover:bg-blue-500' : 'group-hover:bg-teal-500'}`}>
+                    <ChevronRight className="w-5 h-5" />
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-teal-gradient p-8 rounded-[2rem] text-white shadow-2xl shadow-teal-500/20 relative overflow-hidden group">
-            <div className="relative z-10">
-              <Zap className="w-12 h-12 mb-6 text-teal-100" />
-              <h3 className="text-2xl font-black mb-2">Pro Tip</h3>
-              <p className="text-teal-50 font-medium leading-relaxed mb-6">You can now analyze imaging and transcription in a single report for better clinical insight.</p>
-              <button className="bg-white text-teal-600 px-6 py-3 rounded-xl font-black shadow-xl shadow-black/10 hover:scale-105 transition-transform">Try Combined Analysis</button>
+            ))
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+              <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500 font-medium">No recent activity found</p>
             </div>
-            {/* Decorative circles */}
-            <div className="absolute top-[-20%] right-[-20%] w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-            <div className="absolute bottom-[-10%] left-[-10%] w-32 h-32 bg-teal-900/20 rounded-full blur-2xl" />
-          </div>
+          )}
         </div>
       </div>
     </div>

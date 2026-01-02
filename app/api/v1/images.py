@@ -7,12 +7,13 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi.responses import FileResponse
 from bson import ObjectId
 
 from app.config import settings
 from app.database import get_image_analyses_collection
 from app.core import get_current_user, check_database_connection
-from app.services import analyze_medical_image
+from app.services import analyze_medical_image, generate_report_pdf
 
 router = APIRouter(prefix="/images", tags=["Image Analysis"])
 
@@ -159,3 +160,48 @@ async def delete_analysis(
         raise HTTPException(status_code=404, detail="Analysis not found")
     
     return {"message": "Analysis deleted successfully"}
+
+
+@router.get("/{analysis_id}/pdf")
+async def download_analysis_pdf(
+    analysis_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Download image analysis as PDF"""
+    analyses = get_image_analyses_collection()
+    check_database_connection(analyses)
+    
+    analysis = await analyses.find_one({"image_id": analysis_id})
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+        
+    # Wrap in report structure for PDF generator
+    report_dict = {
+        "_id": analysis["_id"],
+        "patient_id": analysis.get("patient_id", "Unknown"),
+        "doctor_id": analysis.get("analyzed_by", "AI System"),
+        "conversation_type": "imaging",
+        "created_at": analysis.get("created_at", datetime.utcnow()),
+        "image_analysis": {
+            "image_type": analysis.get("image_type", "Medical Image"),
+            "findings": analysis.get("findings", ""),
+            "diagnosis": analysis.get("diagnosis", ""),
+            "recommendations": analysis.get("recommendations", ""),
+            "severity": analysis.get("severity", "")
+        },
+        # Standard fields needed for PDF template to not crash
+        "present_complaints": f"{analysis.get('image_type', 'Image')} Analysis",
+        "clinical_details": analysis.get("clinical_notes", "No clinical notes provided"),
+        "physical_examination": "Analysis based on medical imaging",
+        "impression": analysis.get("diagnosis", "See findings"),
+        "management_plan": analysis.get("recommendations", "See recommendations"),
+        "additional_notes": f"Confidence Score: {analysis.get('confidence_score', 'N/A')}"
+    }
+    
+    pdf_path = generate_report_pdf(report_dict)
+    
+    return FileResponse(
+        pdf_path,
+        media_type="application/pdf",
+        filename=f"medical_report_{analysis_id}.pdf"
+    )

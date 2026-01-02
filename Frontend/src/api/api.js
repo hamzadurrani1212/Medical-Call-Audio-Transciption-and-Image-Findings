@@ -94,6 +94,11 @@ export const imageAPI = {
   getAnalysis: (id) => api.get(`/images/${id}`),
 
   deleteAnalysis: (id) => api.delete(`/images/${id}`),
+
+  downloadPDF: (id) => api.get(`/images/${id}/pdf`, {
+    responseType: 'blob',
+    timeout: 30000,
+  }),
 }
 
 export const reportsAPI = {

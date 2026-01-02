@@ -64,12 +64,14 @@ const ReportViewer = () => {
   }
 
   const handleDownloadPDF = async (report) => {
-    if (report.conversation_type === 'imaging') {
-      alert('PDF generation for image analysis is coming soon. Please use the on-screen report for now.')
-      return
-    }
     try {
-      const response = await reportsAPI.downloadPDF(report._id)
+      let response;
+      if (report.conversation_type === 'imaging') {
+        response = await imageAPI.downloadPDF(report._id)
+      } else {
+        response = await reportsAPI.downloadPDF(report._id)
+      }
+
       const blob = new Blob([response.data], { type: 'application/pdf' })
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -278,6 +280,7 @@ const ReportViewer = () => {
 
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+
               {/* Complaints & Impression */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">

@@ -65,7 +65,7 @@ const Register = () => {
   ]
 
   return (
-    <div className="auth-layout min-h-screen bg-white">
+    <div className="auth-layout h-screen w-full overflow-hidden bg-white">
       {/* Left Panel - Branding */}
       <div className="auth-left mesh-gradient relative overflow-hidden">
         <div className="relative z-10 max-w-md w-full animate-in">
@@ -147,7 +147,8 @@ const Register = () => {
                   name="full_name"
                   value={formData.full_name}
                   onChange={handleChange}
-                  placeholder="Dr. John Smith"
+                  // placeholder="Dr. John Smith"
+                  placeholder="Enter Name"
                   className="input-field pl-12 h-14"
                   required
                 />
@@ -188,7 +189,7 @@ const Register = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="••••••••"
+                    placeholder="Enter Password"
                     className="input-field pl-12 h-14 text-lg"
                     required
                   />
@@ -207,7 +208,7 @@ const Register = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    placeholder="••••••••"
+                    placeholder="Enter Password"
                     className="input-field pl-12 h-14 text-lg"
                     required
                   />

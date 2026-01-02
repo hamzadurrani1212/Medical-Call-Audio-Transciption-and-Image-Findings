@@ -50,6 +50,7 @@ async def lifespan(app: FastAPI):
     
     # Ensure directories exist
     os.makedirs(settings.REPORTS_DIR, exist_ok=True)
+    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     os.makedirs(settings.TEMP_DIR, exist_ok=True)
     os.makedirs(settings.LOGS_DIR, exist_ok=True)
     
@@ -173,3 +174,8 @@ frontend_dir = os.path.join(os.path.dirname(__file__), "..", "Frontend", "dist")
 if os.path.exists(frontend_dir):
     app.mount("/app", StaticFiles(directory=frontend_dir, html=True), name="frontend")
     logger.info("Frontend mounted at /app")
+
+# Mount upload directory
+if os.path.exists(settings.UPLOAD_DIR):
+    app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
+    logger.info(f"Uploads mounted at /uploads (Path: {settings.UPLOAD_DIR})")

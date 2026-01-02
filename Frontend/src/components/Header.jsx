@@ -17,11 +17,14 @@ const Header = () => {
                 {/* User Profile */}
                 <div className="flex items-center gap-3 pl-6 border-l border-gray-100 cursor-pointer group">
                     <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold shadow-lg shadow-teal-500/20 group-hover:scale-105 transition-transform">
-                        D
+                        {(user?.full_name || user?.username || 'D')[0].toUpperCase()}
                     </div>
                     <div className="hidden md:block">
                         <div className="flex items-center gap-1">
-                            <span className="text-sm font-bold text-gray-900">Dr. Sarah Wilson</span>
+                            <span className="text-sm font-bold text-gray-900">
+                                {user?.full_name ? '' : 'Dr. '}
+                                {user?.full_name || user?.username || 'Doctor'}
+                            </span>
                             <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
                         </div>
                     </div>
