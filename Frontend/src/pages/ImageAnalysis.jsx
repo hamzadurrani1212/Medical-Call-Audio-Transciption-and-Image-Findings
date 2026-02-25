@@ -15,7 +15,7 @@ import {
   ChevronRight,
   Stethoscope
 } from 'lucide-react'
-import { imageAPI } from '../api/api'
+import { imageAPI, API_BASE_URL, getFullImageUrl } from '../api/api'
 
 const ImageAnalysis = () => {
   const [loading, setLoading] = useState(false)
@@ -105,7 +105,10 @@ const ImageAnalysis = () => {
 
       const response = await imageAPI.analyze(data)
       if (response.data.success) {
-        setAnalysisResult(response.data.analysis)
+        setAnalysisResult({
+          ...response.data.analysis,
+          image_url: response.data.image_url
+        })
         fetchAnalyses()
       }
     } catch (error) {
@@ -133,6 +136,7 @@ const ImageAnalysis = () => {
       severity: analysis.severity,
       confidence_score: analysis.confidence_score,
       recommendations: analysis.recommendations,
+      image_url: analysis.image_url,
       isHistory: true
     })
     // Also scroll back up to the analysis result for better UX
@@ -282,6 +286,17 @@ const ImageAnalysis = () => {
                 </div>
                 <div className="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-widest rounded-full">Success</div>
               </div>
+
+              {/* Analyzed Image Display */}
+              {analysisResult.image_url && (
+                <div className="overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
+                  <img
+                    src={getFullImageUrl(analysisResult.image_url)}
+                    alt="Analyzed medical scan"
+                    className="w-full h-auto max-h-[300px] object-contain bg-gray-900"
+                  />
+                </div>
+              )}
 
               <div className="space-y-6">
                 <div>

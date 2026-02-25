@@ -1,6 +1,7 @@
 import React from 'react'
 import { Bell, ChevronDown } from 'lucide-react'
 import { useAuth } from './AuthProvider'
+import { getFullImageUrl } from '../api/api'
 
 const Header = () => {
     const { user } = useAuth()
@@ -16,9 +17,17 @@ const Header = () => {
 
                 {/* User Profile */}
                 <div className="flex items-center gap-3 pl-6 border-l border-gray-100 cursor-pointer group">
-                    <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold shadow-lg shadow-teal-500/20 group-hover:scale-105 transition-transform">
-                        {(user?.full_name || user?.username || 'D')[0].toUpperCase()}
-                    </div>
+                    {user?.profile_picture_url ? (
+                        <img
+                            src={getFullImageUrl(user.profile_picture_url)}
+                            alt="Profile"
+                            className="w-10 h-10 rounded-full object-cover shadow-lg border-2 border-teal-500/20 group-hover:scale-105 transition-transform"
+                        />
+                    ) : (
+                        <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold shadow-lg shadow-teal-500/20 group-hover:scale-105 transition-transform">
+                            {(user?.full_name || user?.username || 'D')[0].toUpperCase()}
+                        </div>
+                    )}
                     <div className="hidden md:block">
                         <div className="flex items-center gap-1">
                             <span className="text-sm font-bold text-gray-900">

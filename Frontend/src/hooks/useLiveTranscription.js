@@ -10,6 +10,7 @@ export const useLiveTranscription = () => {
   const websocket = useRef(null)
   const mediaRecorder = useRef(null)
   const audioChunks = useRef([])
+  const mimeTypeRef = useRef('')
 
   const connectWebSocket = useCallback((sessionId) => {
     try {
@@ -24,6 +25,8 @@ export const useLiveTranscription = () => {
             }
           } else if (data.type === 'error') {
             setError(data.message)
+          } else if (data.type === 'warning') {
+            console.warn('Transcription warning:', data.message)
           }
         },
         (err) => {
@@ -64,40 +67,73 @@ export const useLiveTranscription = () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
 
-      let mimeType = 'audio/webm'
+      // Determine best supported mime type
+      let mimeType = 'audio/webm;codecs=opus'
+      if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/webm'
+      if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/ogg;codecs=opus'
       if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/ogg'
       if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4'
       if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = ''
 
+      mimeTypeRef.current = mimeType
+      console.log('Using audio mime type:', mimeType)
+
       const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : {})
 
+      // Collect chunks - do NOT send individually
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunks.current.push(event.data)
-          const reader = new FileReader()
-          reader.onload = () => {
-            if (websocket.current) {
-              websocket.current.send({
-                type: 'audio_chunk',
-                data: reader.result.split(',')[1]
-              })
-            }
-          }
-          reader.readAsDataURL(event.data)
         }
       }
 
-      recorder.onstop = () => {
-        if (websocket.current) {
-          websocket.current.send({ type: 'audio_end' })
+      // On stop, combine all chunks into a single blob and send
+      recorder.onstop = async () => {
+        try {
+          if (audioChunks.current.length > 0 && websocket.current) {
+            // Create a proper audio blob from all chunks
+            const audioBlob = new Blob(audioChunks.current, {
+              type: mimeTypeRef.current || 'audio/webm'
+            })
+
+            console.log('Audio blob created:', audioBlob.size, 'bytes, type:', audioBlob.type)
+
+            // Convert blob to base64 and send
+            const reader = new FileReader()
+            reader.onload = () => {
+              if (websocket.current) {
+                const base64Data = reader.result.split(',')[1]
+                // Send as complete audio data
+                websocket.current.send({
+                  type: 'audio_complete',
+                  data: base64Data,
+                  mimeType: audioBlob.type
+                })
+              }
+            }
+            reader.onerror = (err) => {
+              console.error('FileReader error:', err)
+              setError('Failed to process audio data')
+            }
+            reader.readAsDataURL(audioBlob)
+          } else {
+            console.warn('No audio chunks to send')
+          }
+        } catch (err) {
+          console.error('Error processing audio:', err)
+          setError('Failed to process recorded audio')
+        } finally {
+          stream.getTracks().forEach(track => track.stop())
+          audioChunks.current = []
         }
-        stream.getTracks().forEach(track => track.stop())
-        audioChunks.current = []
       }
 
       mediaRecorder.current = recorder
-      recorder.start(1000)
+      // Start recording - collect data every 500ms for smooth collection
+      recorder.start(500)
       setIsRecording(true)
+      // Clear any previous errors
+      setError(null)
 
     } catch (err) {
       setError('Microphone access denied or not available')
@@ -124,6 +160,15 @@ export const useLiveTranscription = () => {
     setTranscript('')
   }, [])
 
+  const setLanguage = useCallback((language) => {
+    if (websocket.current) {
+      websocket.current.send({
+        type: 'set_language',
+        language: language
+      })
+    }
+  }, [])
+
   return {
     isRecording,
     isConnected,
@@ -134,6 +179,7 @@ export const useLiveTranscription = () => {
     stopRecording,
     disconnect,
     clearTranscript,
+    setLanguage,
   }
 }
 

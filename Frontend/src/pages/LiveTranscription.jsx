@@ -23,10 +23,23 @@ const LiveTranscription = () => {
   const [patientInfo, setPatientInfo] = useState({
     patientId: '',
     conversationType: 'consultation',
-    notes: ''
+    notes: '',
+    language: 'auto'
   })
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
+
+  const languages = [
+    { code: 'auto', name: 'Auto Detect' },
+    { code: 'en', name: 'English' },
+    { code: 'ur', name: 'Urdu' },
+    { code: 'hi', name: 'Hindi' },
+    { code: 'ar', name: 'Arabic' },
+    { code: 'es', name: 'Spanish' },
+    { code: 'fr', name: 'French' },
+    { code: 'zh', name: 'Chinese' },
+    { code: 'de', name: 'German' }
+  ]
 
   const {
     isRecording,
@@ -38,6 +51,7 @@ const LiveTranscription = () => {
     stopRecording,
     disconnect,
     clearTranscript,
+    setLanguage,
   } = useLiveTranscription()
 
   useEffect(() => {
@@ -48,6 +62,10 @@ const LiveTranscription = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setPatientInfo(prev => ({ ...prev, [name]: value }))
+
+    if (name === 'language') {
+      setLanguage(value)
+    }
   }
 
   const handleStartRecording = () => {
@@ -55,6 +73,8 @@ const LiveTranscription = () => {
       setMessage({ type: 'error', text: 'Not connected to transcription service' })
       return
     }
+    // Ensure current language is set on start
+    setLanguage(patientInfo.language)
     startRecording()
     setMessage({ type: '', text: '' })
   }
@@ -74,7 +94,8 @@ const LiveTranscription = () => {
       const result = await transcriptionAPI.summarize({
         transcript,
         patient_id: patientInfo.patientId,
-        conversation_type: patientInfo.conversationType
+        conversation_type: patientInfo.conversationType,
+        language: patientInfo.language
       })
 
       if (result.data.success) {
@@ -149,7 +170,6 @@ const LiveTranscription = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-700 ml-1 tracking-wide">Consultation Type</label>
                 <select
                   name="conversationType"
                   value={patientInfo.conversationType}
@@ -158,6 +178,20 @@ const LiveTranscription = () => {
                 >
                   {conversationTypes.map(type => (
                     <option key={type.value} value={type.value}>{type.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-gray-700 ml-1 tracking-wide">Input Language</label>
+                <select
+                  name="language"
+                  value={patientInfo.language}
+                  onChange={handleInputChange}
+                  className="input-field"
+                >
+                  {languages.map(lang => (
+                    <option key={lang.code} value={lang.code}>{lang.name}</option>
                   ))}
                 </select>
               </div>
@@ -315,7 +349,7 @@ const LiveTranscription = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 

@@ -15,9 +15,11 @@ import {
   AlertCircle,
   FileAudio,
   Stethoscope,
-  Info
+  Info,
+  ChevronRight,
+  Trash2
 } from 'lucide-react'
-import { reportsAPI, imageAPI } from '../api/api'
+import { reportsAPI, imageAPI, API_BASE_URL, getFullImageUrl } from '../api/api'
 
 const ReportViewer = () => {
   const [reports, setReports] = useState([])
@@ -89,6 +91,26 @@ const ReportViewer = () => {
   const handleViewReport = (report) => {
     setSelectedReport(report)
     setIsModalOpen(true)
+  }
+
+  const handleDeleteReport = async (report) => {
+    if (!window.confirm(`Are you sure you want to delete this ${report.conversation_type === 'imaging' ? 'imaging' : 'transcription'} report?`)) {
+      return
+    }
+
+    try {
+      if (report.conversation_type === 'imaging') {
+        await imageAPI.deleteAnalysis(report._id)
+      } else {
+        await reportsAPI.delete(report._id)
+      }
+
+      // Update local state
+      setReports(prev => prev.filter(r => r._id !== report._id))
+    } catch (error) {
+      console.error('Failed to delete report:', error)
+      alert('Failed to delete report. Please try again.')
+    }
   }
 
   const filters = ['All Reports', 'Transcriptions', 'Imaging', 'Combined']
@@ -219,6 +241,12 @@ const ReportViewer = () => {
                   >
                     <Download className="w-4 h-4" />
                   </button>
+                  <button
+                    onClick={() => handleDeleteReport(report)}
+                    className="flex items-center justify-center w-10 h-10 rounded-xl border border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 transition-all"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -280,6 +308,23 @@ const ReportViewer = () => {
 
             {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+
+              {/* Analyzed Image Display for Imaging Reports */}
+              {selectedReport.conversation_type === 'imaging' && selectedReport.image_url && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <ScanLine className="w-4 h-4 text-teal-500" />
+                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Analyzed Medical Scan</span>
+                  </div>
+                  <div className="overflow-hidden rounded-3xl border border-gray-100 shadow-sm">
+                    <img
+                      src={getFullImageUrl(selectedReport.image_url)}
+                      alt="Analyzed medical scan"
+                      className="w-full h-auto max-h-[350px] object-contain bg-gray-900"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Complaints & Impression */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -9,7 +9,8 @@ const Login = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    rememberMe: false
+    // rememberMe: false
+    rememberMe: true
   })
   const { login } = useAuth()
   const navigate = useNavigate()

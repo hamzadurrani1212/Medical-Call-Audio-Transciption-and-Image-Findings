@@ -1,13 +1,35 @@
 import axios from 'axios'
 
-// Use environment variables for production flexibility
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1'
-const WS_BASE = import.meta.env.VITE_WS_URL || 'ws://127.0.0.1:8000/ws/transcribe'
+// Relative base — requests go through Vite proxy in dev, same-origin in prod build.
+// Override with VITE_API_URL env var if you need to point to a remote server.
+const API_BASE = import.meta.env.VITE_API_URL || '/api/v1'
+
+// WebSocket — goes through Vite proxy (/ws → ws://127.0.0.1:8000/ws)
+const WS_HOST = typeof window !== 'undefined'
+  ? (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host
+  : 'ws://127.0.0.1:3000'
+const WS_BASE = import.meta.env.VITE_WS_URL || `${WS_HOST}/ws/transcribe`
+
+// For building absolute image URLs (images are served directly from the backend)
+const SERVER_ROOT = import.meta.env.VITE_SERVER_URL || 'http://127.0.0.1:8000'
+
+// Export base URL for image URLs
+export const API_BASE_URL = API_BASE
+
+/**
+ * Utility to convert relative image paths (like /uploads/file.jpg) 
+ * to full URLs using the base server address.
+ */
+export const getFullImageUrl = (path) => {
+  if (!path) return null
+  return `${SERVER_ROOT}${path}`
+}
 
 // Create axios instance with default config
+// withCredentials is NOT set globally — Bearer token in Authorization header is used.
+// Only the refresh-token call sends credentials (for the httpOnly cookie).
 const api = axios.create({
   baseURL: API_BASE,
-  withCredentials: true,
   timeout: 30000,
 })
 
@@ -33,7 +55,8 @@ api.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        const response = await axios.post(`${API_BASE}/auth/refresh-token`, {}, {
+        // withCredentials here so the httpOnly refresh_token cookie is sent
+        const response = await axios.post(`${SERVER_ROOT}/api/v1/auth/refresh-token`, {}, {
           withCredentials: true,
           timeout: 10000
         })
@@ -118,6 +141,18 @@ export const reportsAPI = {
   downloadPDF: (id) => api.get(`/reports/${id}/pdf`, {
     responseType: 'blob',
     timeout: 30000,
+  }),
+}
+
+export const usersAPI = {
+  getMe: () => api.get('/users/me'),
+
+  updateMe: (userData) => api.patch('/users/me', userData),
+
+  changePassword: (passwordData) => api.post('/users/me/change-password', passwordData),
+
+  uploadAvatar: (formData) => api.post('/users/me/avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
   }),
 }
 
