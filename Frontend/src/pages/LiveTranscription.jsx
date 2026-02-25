@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Info
 } from 'lucide-react'
+import { toast } from 'react-toastify'
 import useLiveTranscription from '../hooks/useLiveTranscription'
 import { transcriptionAPI } from '../api/api'
 
@@ -27,7 +28,6 @@ const LiveTranscription = () => {
     language: 'auto'
   })
   const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState({ type: '', text: '' })
 
   const languages = [
     { code: 'auto', name: 'Auto Detect' },
@@ -70,13 +70,12 @@ const LiveTranscription = () => {
 
   const handleStartRecording = () => {
     if (!isConnected) {
-      setMessage({ type: 'error', text: 'Not connected to transcription service' })
+      toast.error('Not connected to transcription service')
       return
     }
     // Ensure current language is set on start
     setLanguage(patientInfo.language)
     startRecording()
-    setMessage({ type: '', text: '' })
   }
 
   const handleStopRecording = () => {
@@ -85,7 +84,7 @@ const LiveTranscription = () => {
 
   const handleSaveReport = async () => {
     if (!transcript.trim()) {
-      setMessage({ type: 'warning', text: 'No transcript to save' })
+      toast.warning('No transcript to save')
       return
     }
 
@@ -99,12 +98,12 @@ const LiveTranscription = () => {
       })
 
       if (result.data.success) {
-        setMessage({ type: 'success', text: 'Medical report generated successfully!' })
+        toast.success('Medical report generated successfully!')
         clearTranscript()
         setPatientInfo({ patientId: '', conversationType: 'consultation', notes: '' })
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to generate medical report' })
+      toast.error('Failed to generate medical report')
       console.error('Save error:', error)
     } finally {
       setSaving(false)
@@ -134,13 +133,10 @@ const LiveTranscription = () => {
       </div>
 
       {/* Messages */}
-      {(error || message.text) && (
-        <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in border ${message.type === 'success' ? 'bg-green-50 border-green-100 text-green-700' :
-          message.type === 'warning' ? 'bg-yellow-50 border-yellow-100 text-yellow-700' :
-            'bg-red-50 border-red-100 text-red-700'
-          }`}>
+      {error && (
+        <div className="p-4 rounded-2xl flex items-center gap-3 animate-in border bg-red-50 border-red-100 text-red-700">
           <Info className="w-5 h-5 flex-shrink-0" />
-          <p className="font-bold text-sm tracking-wide">{error || message.text}</p>
+          <p className="font-bold text-sm tracking-wide">{error}</p>
         </div>
       )}
 

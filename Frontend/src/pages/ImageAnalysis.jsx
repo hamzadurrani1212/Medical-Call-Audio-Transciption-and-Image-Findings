@@ -12,9 +12,10 @@ import {
   User,
   History,
   Info,
-  ChevronRight,
-  Stethoscope
+  Stethoscope,
+  ChevronRight
 } from 'lucide-react'
+import { toast } from 'react-toastify'
 import { imageAPI, API_BASE_URL, getFullImageUrl } from '../api/api'
 
 const ImageAnalysis = () => {
@@ -42,7 +43,6 @@ const ImageAnalysis = () => {
     patient_id: '',
     clinical_context: ''
   })
-  const [error, setError] = useState('')
 
   const imageTypes = [
     { value: 'CT', label: 'CT Scan' },
@@ -71,16 +71,15 @@ const ImageAnalysis = () => {
     const file = e.target.files[0]
     if (file) {
       if (!file.type.startsWith('image/')) {
-        setError('Please select an image file')
+        toast.error('Please select an image file')
         return
       }
       if (file.size > 10 * 1024 * 1024) {
-        setError('Image must be smaller than 10MB')
+        toast.error('Image must be smaller than 10MB')
         return
       }
       setSelectedImage(file)
       setImagePreview(URL.createObjectURL(file))
-      setError('')
     }
   }
 
@@ -94,7 +93,6 @@ const ImageAnalysis = () => {
     if (!selectedImage || !formData.image_type) return
 
     setAnalyzing(true)
-    setError('')
 
     try {
       const data = new FormData()
@@ -105,6 +103,7 @@ const ImageAnalysis = () => {
 
       const response = await imageAPI.analyze(data)
       if (response.data.success) {
+        toast.success('Analysis completed successfully!')
         setAnalysisResult({
           ...response.data.analysis,
           image_url: response.data.image_url
@@ -112,7 +111,7 @@ const ImageAnalysis = () => {
         fetchAnalyses()
       }
     } catch (error) {
-      setError('Analysis failed. Attempting to simulate for preview purposes.')
+      toast.error('Analysis failed. Attempting to simulate for preview purposes.')
       // Simulation for UI demo
       setTimeout(() => {
         setAnalysisResult({
@@ -169,13 +168,6 @@ const ImageAnalysis = () => {
               </div>
               <h2 className="text-2xl font-black text-gray-900 tracking-tight">Import Scan</h2>
             </div>
-
-            {error && (
-              <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 flex items-center gap-3 text-red-600 text-sm font-bold animate-in">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                {error}
-              </div>
-            )}
 
             <form onSubmit={handleAnalyze} className="space-y-6">
               {/* Image Input */}

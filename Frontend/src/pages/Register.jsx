@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAuth } from '../components/AuthProvider'
 import { User, Mail, Lock, ArrowRight, Activity, Check, ShieldCheck, Zap, HeartPulse } from 'lucide-react'
 
 const Register = () => {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const [formData, setFormData] = useState({
     full_name: '',
     username: '',
@@ -22,7 +22,6 @@ const Register = () => {
       ...prev,
       [name]: value
     }))
-    if (error) setError('')
   }
 
   const handleSubmit = async (e) => {
@@ -30,29 +29,29 @@ const Register = () => {
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
+      toast.error('Passwords do not match')
       return
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
+      toast.error('Password must be at least 6 characters')
       return
     }
 
     setLoading(true)
-    setError('')
 
     const { confirmPassword, ...registerData } = formData
 
     try {
       const result = await register(registerData)
       if (result.success) {
+        toast.success('Registration successful! Please sign in.')
         navigate('/login')
       } else {
-        setError(result.error || 'Registration failed. Please try again.')
+        toast.error(result.error || 'Registration failed. Please try again.')
       }
     } catch (err) {
-      setError('A connection error occurred. Please try again.')
+      toast.error('A connection error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -124,14 +123,6 @@ const Register = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Create account</h2>
             <p className="text-gray-500 font-medium">Get started with your free clinical workspace today</p>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-medium flex items-center gap-3 animate-in">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-600" />
-              {error}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">

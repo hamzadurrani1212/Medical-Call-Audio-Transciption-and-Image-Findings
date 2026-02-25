@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Trash2
 } from 'lucide-react'
+import { toast } from 'react-toastify'
 import { reportsAPI, imageAPI, API_BASE_URL, getFullImageUrl } from '../api/api'
 
 const ReportViewer = () => {
@@ -60,6 +61,7 @@ const ReportViewer = () => {
       setReports(combined)
     } catch (error) {
       console.error('Failed to fetch reports:', error)
+      toast.error('Failed to fetch reports')
     } finally {
       setLoading(false)
     }
@@ -85,6 +87,7 @@ const ReportViewer = () => {
       window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error('Failed to download PDF:', error)
+      toast.error('Failed to download PDF')
     }
   }
 
@@ -107,9 +110,10 @@ const ReportViewer = () => {
 
       // Update local state
       setReports(prev => prev.filter(r => r._id !== report._id))
+      toast.success('Report deleted successfully')
     } catch (error) {
       console.error('Failed to delete report:', error)
-      alert('Failed to delete report. Please try again.')
+      toast.error('Failed to delete report. Please try again.')
     }
   }
 

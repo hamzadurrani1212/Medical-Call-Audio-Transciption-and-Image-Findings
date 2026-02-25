@@ -14,6 +14,7 @@ import {
     Loader2,
     AlertCircle
 } from 'lucide-react'
+import { toast } from 'react-toastify'
 import { useAuth } from '../components/AuthProvider'
 import { usersAPI, getFullImageUrl } from '../api/api'
 
@@ -21,7 +22,6 @@ const Settings = () => {
     const { user, updateUserData } = useAuth()
     const [activeTab, setActiveTab] = useState('profile')
     const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState({ type: '', text: '' })
 
     const [notifications, setNotifications] = useState({
         email: true,
@@ -70,7 +70,6 @@ const Settings = () => {
 
     const handleSave = async () => {
         setLoading(true)
-        setMessage({ type: '', text: '' })
         try {
             const response = await usersAPI.updateMe({
                 full_name: formData.fullName,
@@ -79,10 +78,10 @@ const Settings = () => {
             })
 
             updateUserData(response.data)
-            setMessage({ type: 'success', text: 'Profile updated successfully!' })
+            toast.success('Profile updated successfully!')
         } catch (error) {
             console.error('Update error:', error)
-            setMessage({ type: 'error', text: 'Failed to update profile' })
+            toast.error('Failed to update profile')
         } finally {
             setLoading(false)
         }
@@ -90,22 +89,21 @@ const Settings = () => {
 
     const handleChangePassword = async () => {
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            setMessage({ type: 'error', text: 'New passwords do not match' })
+            toast.error('New passwords do not match')
             return
         }
 
         setLoading(true)
-        setMessage({ type: '', text: '' })
         try {
             await usersAPI.changePassword({
                 current_password: passwordData.currentPassword,
                 new_password: passwordData.newPassword
             })
-            setMessage({ type: 'success', text: 'Password changed successfully!' })
+            toast.success('Password changed successfully!')
             setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
         } catch (error) {
             console.error('Password change error:', error)
-            setMessage({ type: 'error', text: error.response?.data?.detail || 'Failed to change password' })
+            toast.error(error.response?.data?.detail || 'Failed to change password')
         } finally {
             setLoading(false)
         }
@@ -119,14 +117,13 @@ const Settings = () => {
         formDataFile.append('file', file)
 
         setLoading(true)
-        setMessage({ type: '', text: '' })
         try {
             const response = await usersAPI.uploadAvatar(formDataFile)
             updateUserData({ profile_picture_url: response.data.profile_picture_url })
-            setMessage({ type: 'success', text: 'Profile picture updated!' })
+            toast.success('Profile picture updated!')
         } catch (error) {
             console.error('Avatar upload error:', error)
-            setMessage({ type: 'error', text: 'Failed to upload profile picture' })
+            toast.error('Failed to upload profile picture')
         } finally {
             setLoading(false)
         }
@@ -139,14 +136,6 @@ const Settings = () => {
                 <h1 className="text-3xl font-black text-gray-900 tracking-tight">Settings</h1>
                 <p className="text-gray-500 mt-1">Manage your account settings and preferences</p>
             </div>
-
-            {/* Messages */}
-            {message.text && (
-                <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in border ${message.type === 'success' ? 'bg-green-50 border-green-100 text-green-700' : 'bg-red-50 border-red-100 text-red-700'}`}>
-                    {message.type === 'success' ? <Check className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-                    <p className="font-bold text-sm tracking-wide">{message.text}</p>
-                </div>
-            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Navigation Sidebar */}

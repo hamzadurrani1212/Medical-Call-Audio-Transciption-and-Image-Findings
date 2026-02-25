@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAuth } from '../components/AuthProvider'
 import { Mail, Lock, ArrowRight, Activity, ShieldCheck, Zap, BarChart3 } from 'lucide-react'
 
 const Login = () => {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -21,13 +21,11 @@ const Login = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }))
-    if (error) setError('')
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    setError('')
 
     try {
       const result = await login({
@@ -35,12 +33,13 @@ const Login = () => {
         password: formData.password
       })
       if (result.success) {
+        toast.success('Successfully logged in!')
         navigate('/dashboard')
       } else {
-        setError(result.error || 'Invalid credentials. Please check your email and password.')
+        toast.error(result.error || 'Invalid credentials. Please check your email and password.')
       }
     } catch (err) {
-      setError('A connection error occurred. Please try again.')
+      toast.error('A connection error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -112,14 +111,6 @@ const Login = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Welcome back</h2>
             <p className="text-gray-500 font-medium">Please enter your credentials to access your workspace</p>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-medium flex items-center gap-3 animate-in">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-600" />
-              {error}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
