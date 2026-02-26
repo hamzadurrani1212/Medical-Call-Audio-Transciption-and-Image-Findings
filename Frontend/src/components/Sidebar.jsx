@@ -6,6 +6,7 @@ import {
   Mic,
   ScanLine,
   FileText,
+  MessageSquare,
   Settings,
   LogOut,
   Activity
@@ -36,6 +37,11 @@ const Sidebar = () => {
       path: '/reports',
       icon: FileText,
       label: 'Reports'
+    },
+    {
+      path: '/messages',
+      icon: MessageSquare,
+      label: 'Messages'
     },
     {
       path: '/settings',
@@ -80,8 +86,8 @@ const Sidebar = () => {
               key={item.path}
               onClick={() => handleNavigation(item.path)}
               className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group ${active
-                  ? 'bg-teal-500 text-white shadow-xl shadow-teal-500/20 active-nav-link'
-                  : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'
+                ? 'bg-teal-500 text-white shadow-xl shadow-teal-500/20 active-nav-link'
+                : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'
                 }`}
             >
               <Icon className={`w-5 h-5 transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110'}`} />

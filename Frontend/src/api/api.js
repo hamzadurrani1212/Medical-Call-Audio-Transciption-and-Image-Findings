@@ -154,6 +154,8 @@ export const usersAPI = {
   uploadAvatar: (formData) => api.post('/users/me/avatar', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
+
+  searchUsers: (query) => api.get(`/users/search?q=${encodeURIComponent(query)}`),
 }
 
 export const analyticsAPI = {
@@ -174,6 +176,16 @@ export const patientsAPI = {
   delete: (id) => api.delete(`/patients/${id}`),
 }
 
+export const chatsAPI = {
+  getUserChats: () => api.get('/chats/'),
+  getChatMessages: (chatId, params = {}) => {
+    const { skip = 0, limit = 50 } = params
+    const queryParams = new URLSearchParams({ skip, limit })
+    return api.get(`/chats/${chatId}/messages?${queryParams.toString()}`)
+  },
+  createChat: (data) => api.post('/chats/', data),
+}
+
 export const systemAPI = {
   health: () => api.get('/analytics/health'),
 }
@@ -181,6 +193,28 @@ export const systemAPI = {
 // WebSocket helper
 export const createWebSocket = (sessionId, onMessage, onError, onOpen, onClose) => {
   const ws = new WebSocket(`${WS_BASE}/${sessionId}`)
+
+  ws.onopen = (event) => onOpen && onOpen(event)
+  ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data)
+      if (onMessage) onMessage(data)
+    } catch (e) {
+      console.error('WS Error:', e)
+    }
+  }
+  ws.onerror = (error) => onError && onError(error)
+  ws.onclose = (event) => onClose && onClose(event)
+
+  return {
+    send: (data) => ws.readyState === WebSocket.OPEN && ws.send(JSON.stringify(data)),
+    close: () => ws.close()
+  }
+}
+
+export const createChatWebSocket = (token, onMessage, onError, onOpen, onClose) => {
+  const wsUrl = `${WS_HOST}/ws/chat/${token}`
+  const ws = new WebSocket(wsUrl)
 
   ws.onopen = (event) => onOpen && onOpen(event)
   ws.onmessage = (event) => {

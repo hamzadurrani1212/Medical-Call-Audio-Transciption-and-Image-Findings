@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard'
 import LiveTranscription from './pages/LiveTranscription'
 import ImageAnalysis from './pages/ImageAnalysis'
 import ReportViewer from './pages/ReportViewer'
+import Messages from './pages/Messages'
 import Settings from './pages/Settings'
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           <Route path="transcription" element={<LiveTranscription />} />
           <Route path="image-analysis" element={<ImageAnalysis />} />
           <Route path="reports" element={<ReportViewer />} />
+          <Route path="messages" element={<Messages />} />
           <Route path="settings" element={<Settings />} />
         </Route>
 
